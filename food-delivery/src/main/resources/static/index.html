@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoodieExpress</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Poppins',sans-serif;background:#f7f7f7;color:#222;}
+:root{--red:#ff3d00;--dark:#1a1a2e;--card:#fff;--gray:#f0f0f0;}
+
+/* NAV */
+nav{background:var(--dark);color:#fff;padding:0 32px;display:flex;justify-content:space-between;align-items:center;height:64px;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,0.3);}
+.logo{font-size:22px;font-weight:800;letter-spacing:-0.5px;}
+.logo span{color:var(--red);}
+.nav-links button{background:var(--red);color:#fff;border:none;padding:9px 22px;border-radius:8px;cursor:pointer;font-family:'Poppins',sans-serif;font-weight:600;font-size:14px;margin-left:8px;transition:opacity 0.2s;}
+.nav-links button.outline{background:transparent;border:2px solid #fff;}
+.nav-links button:hover{opacity:0.85;}
+
+/* WELCOME BAR */
+#welcome-bar{background:var(--red);color:#fff;padding:10px 32px;display:none;justify-content:space-between;align-items:center;font-size:14px;font-weight:500;}
+#welcome-bar span.logout{cursor:pointer;text-decoration:underline;font-weight:600;}
+
+/* PAGES */
+.page{display:none;min-height:calc(100vh - 64px);}
+.page.active{display:block;}
+
+/* AUTH */
+.auth-wrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 64px);background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);}
+.auth-box{background:#fff;border-radius:20px;padding:44px 40px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+.auth-box h2{font-size:26px;font-weight:800;color:var(--dark);margin-bottom:6px;}
+.auth-box p{color:#888;font-size:14px;margin-bottom:28px;}
+.auth-box input{width:100%;padding:13px 16px;border:2px solid #eee;border-radius:10px;font-family:'Poppins',sans-serif;font-size:14px;margin-bottom:14px;outline:none;transition:border 0.2s;}
+.auth-box input:focus{border-color:var(--red);}
+.auth-box .btn-main{width:100%;padding:14px;background:var(--red);color:#fff;border:none;border-radius:10px;font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:opacity 0.2s;}
+.auth-box .btn-main:hover{opacity:0.9;}
+.auth-box .switch{text-align:center;margin-top:18px;font-size:13px;color:#888;}
+.auth-box .switch span{color:var(--red);cursor:pointer;font-weight:600;}
+.msg{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none;}
+.msg.success{background:#e8f5e9;color:#2e7d32;display:block;}
+.msg.error{background:#ffebee;color:#c62828;display:block;}
+
+/* TAB NAV */
+.tab-nav{display:flex;background:#fff;border-bottom:3px solid #eee;padding:0 32px;gap:4px;position:sticky;top:64px;z-index:99;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.tab-btn{padding:16px 20px;border:none;background:none;font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;color:#999;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all 0.2s;}
+.tab-btn.active{color:var(--red);border-bottom-color:var(--red);}
+.tab-btn:hover{color:var(--red);}
+.tab-content{display:none;padding:32px;}
+.tab-content.active{display:block;}
+
+/* RESTAURANTS */
+.section-title{font-size:22px;font-weight:800;color:var(--dark);margin-bottom:24px;}
+.restaurant-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;}
+.r-card{background:#fff;border-radius:16px;padding:24px;box-shadow:0 4px 16px rgba(0,0,0,0.07);cursor:pointer;transition:all 0.25s;border:2px solid transparent;position:relative;overflow:hidden;}
+.r-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--red);}
+.r-card:hover{transform:translateY(-5px);box-shadow:0 12px 32px rgba(0,0,0,0.12);border-color:var(--red);}
+.r-card h3{font-size:18px;font-weight:700;margin-bottom:8px;color:var(--dark);}
+.r-card p{font-size:13px;color:#777;margin-bottom:4px;}
+.badge{display:inline-block;background:#fff3f0;color:var(--red);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;margin-top:10px;}
+.empty-msg{color:#aaa;font-size:15px;padding:40px 0;text-align:center;}
+
+/* MENU PAGE */
+#page-menu{background:#f7f7f7;}
+.menu-header{background:var(--dark);color:#fff;padding:24px 32px;display:flex;align-items:center;gap:16px;}
+.menu-header button{background:rgba(255,255,255,0.15);border:none;color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;}
+.menu-header h2{font-size:22px;font-weight:800;}
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;padding:32px;}
+.m-card{background:#fff;border-radius:16px;padding:22px;box-shadow:0 4px 16px rgba(0,0,0,0.07);display:flex;justify-content:space-between;align-items:center;gap:16px;}
+.m-card-info h4{font-size:16px;font-weight:700;color:var(--dark);margin-bottom:4px;}
+.m-card-info p{font-size:12px;color:#888;margin-bottom:4px;}
+.m-card-info .cat{font-size:11px;background:#f0f0f0;color:#555;padding:3px 10px;border-radius:20px;display:inline-block;}
+.m-card-right{text-align:right;flex-shrink:0;}
+.m-price{font-size:20px;font-weight:800;color:var(--red);margin-bottom:10px;}
+.btn-order{background:var(--red);color:#fff;border:none;padding:10px 18px;border-radius:10px;cursor:pointer;font-family:'Poppins',sans-serif;font-weight:700;font-size:13px;transition:opacity 0.2s;}
+.btn-order:hover{opacity:0.85;}
+.order-toast{background:#e8f5e9;color:#2e7d32;border-radius:12px;padding:18px 24px;text-align:center;font-weight:600;font-size:14px;display:none;margin:0 32px 24px;}
+
+/* ORDERS */
+.o-card{background:#fff;border-radius:16px;padding:22px 26px;margin-bottom:16px;box-shadow:0 4px 16px rgba(0,0,0,0.07);border-left:4px solid var(--red);}
+.o-card h4{font-size:16px;font-weight:700;color:var(--dark);margin-bottom:10px;}
+.o-card p{font-size:13px;color:#666;margin-bottom:4px;}
+.o-status{display:inline-block;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;margin-top:10px;}
+.s-PLACED{background:#fff8e1;color:#f57f17;}
+.s-PREPARING{background:#e3f2fd;color:#1565c0;}
+.s-DELIVERED{background:#e8f5e9;color:#2e7d32;}
+
+/* ADMIN */
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
+@media(max-width:700px){.admin-grid{grid-template-columns:1fr;}}
+.admin-card{background:#fff;border-radius:16px;padding:28px;box-shadow:0 4px 16px rgba(0,0,0,0.07);}
+.admin-card h3{font-size:17px;font-weight:800;color:var(--dark);margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #f0f0f0;}
+.admin-card input,.admin-card select{width:100%;padding:11px 14px;border:2px solid #eee;border-radius:10px;font-family:'Poppins',sans-serif;font-size:13px;margin-bottom:12px;outline:none;transition:border 0.2s;}
+.admin-card input:focus,.admin-card select:focus{border-color:var(--red);}
+.admin-card .btn-main{width:100%;padding:12px;background:var(--red);color:#fff;border:none;border-radius:10px;font-family:'Poppins',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:opacity 0.2s;}
+.admin-card .btn-main:hover{opacity:0.9;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">🍕 Foodie<span>Express</span></div>
+  <div class="nav-links" id="nav-links">
+    <button class="outline" onclick="showPage('login')">Login</button>
+    <button onclick="showPage('register')">Register</button>
+  </div>
+</nav>
+
+<div id="welcome-bar">
+  <span>👋 Welcome, <strong id="wname"></strong>!</span>
+  <span class="logout" onclick="logout()">Logout</span>
+</div>
+
+<!-- REGISTER -->
+<div id="page-register" class="page active">
+  <div class="auth-wrap">
+    <div class="auth-box">
+      <h2>Create Account</h2>
+      <p>Join FoodieExpress and order your favourites!</p>
+      <div id="reg-msg" class="msg"></div>
+      <input type="text" id="reg-name" placeholder="Full Name"/>
+      <input type="email" id="reg-email" placeholder="Email Address"/>
+      <input type="password" id="reg-pass" placeholder="Password"/>
+      <button class="btn-main" onclick="register()">Create Account</button>
+      <div class="switch">Already have an account? <span onclick="showPage('login')">Login</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="page-login" class="page">
+  <div class="auth-wrap">
+    <div class="auth-box">
+      <h2>Welcome Back!</h2>
+      <p>Login to continue ordering</p>
+      <div id="login-msg" class="msg"></div>
+      <input type="email" id="login-email" placeholder="Email Address"/>
+      <input type="password" id="login-pass" placeholder="Password"/>
+      <button class="btn-main" onclick="login()">Login</button>
+      <div class="switch">No account? <span onclick="showPage('register')">Register</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="page-app" class="page">
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab(this,'restaurants')">🍽️ Restaurants</button>
+    <button class="tab-btn" onclick="switchTab(this,'orders')">📦 My Orders</button>
+    <button class="tab-btn" onclick="switchTab(this,'admin'); loadRestaurantDropdown()">⚙️ Admin</button>
+  </div>
+
+  <!-- RESTAURANTS TAB -->
+  <div id="tab-restaurants" class="tab-content active">
+    <div class="section-title">Restaurants Near You</div>
+    <div class="restaurant-grid" id="r-grid"><div class="empty-msg">Loading...</div></div>
+  </div>
+
+  <!-- ORDERS TAB -->
+  <div id="tab-orders" class="tab-content">
+    <div class="section-title">My Orders</div>
+    <div id="orders-list"><div class="empty-msg">Loading...</div></div>
+  </div>
+
+  <!-- ADMIN TAB -->
+  <div id="tab-admin" class="tab-content">
+    <div class="section-title">Admin Panel</div>
+    <div class="admin-grid">
+      <div class="admin-card">
+        <h3>➕ Add Restaurant</h3>
+        <div id="ar-msg" class="msg"></div>
+        <input type="text" id="ar-name" placeholder="Restaurant Name"/>
+        <input type="text" id="ar-address" placeholder="Address"/>
+        <input type="text" id="ar-cuisine" placeholder="Cuisine (e.g. Italian)"/>
+        <input type="text" id="ar-phone" placeholder="Phone Number"/>
+        <button class="btn-main" onclick="addRestaurant()">Add Restaurant</button>
+      </div>
+      <div class="admin-card">
+        <h3>🍔 Add Menu Item</h3>
+        <div id="am-msg" class="msg"></div>
+        <select id="am-rest"><option value="">Select Restaurant</option></select>
+        <input type="text" id="am-name" placeholder="Item Name"/>
+        <input type="text" id="am-desc" placeholder="Description"/>
+        <input type="number" id="am-price" placeholder="Price (₹)"/>
+        <input type="text" id="am-cat" placeholder="Category (e.g. Pizza)"/>
+        <button class="btn-main" onclick="addMenuItem()">Add Menu Item</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MENU PAGE -->
+<div id="page-menu" class="page">
+<div class="menu-header">
+    <button onclick="goBack()">← Back</button>
+    <h2 id="menu-title"></h2>
+    <button onclick="toggleCart()" style="margin-left:auto;background:var(--red);border:none;color:#fff;padding:9px 20px;border-radius:8px;cursor:pointer;font-family:'Poppins',sans-serif;font-weight:700;font-size:14px;">🛒 Cart <span id="cart-count" style="background:#fff;color:var(--red);border-radius:50%;padding:2px 7px;font-size:12px;margin-left:4px;">0</span></button>
+</div>
+  <div id="order-toast" class="order-toast">✅ Order placed! Your food is on the way 🚀</div>
+
+<!-- CART SIDEBAR -->
+<div id="cart-overlay" onclick="toggleCart()" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:200;"></div>
+<div id="cart-sidebar" style="display:none;position:fixed;top:0;right:0;width:360px;height:100%;background:#fff;z-index:201;box-shadow:-4px 0 20px rgba(0,0,0,0.15);overflow-y:auto;flex-direction:column;">
+  <div style="padding:20px 24px;background:var(--dark);color:#fff;display:flex;justify-content:space-between;align-items:center;">
+    <h3 style="font-size:18px;font-weight:800;">🛒 Your Cart</h3>
+    <button onclick="toggleCart()" style="background:rgba(255,255,255,0.2);border:none;color:#fff;padding:6px 12px;border-radius:8px;cursor:pointer;font-family:'Poppins',sans-serif;font-weight:600;">✕ Close</button>
+  </div>
+  <div id="cart-items" style="padding:20px;flex:1;"></div>
+  <div id="cart-footer" style="padding:20px;border-top:2px solid #f0f0f0;display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <span style="font-size:16px;font-weight:700;color:var(--dark);">Total:</span>
+      <span id="cart-total" style="font-size:22px;font-weight:800;color:var(--red);">₹0</span>
+    </div>
+    <button onclick="placeCartOrder()" style="width:100%;padding:14px;background:var(--red);color:#fff;border:none;border-radius:10px;font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;cursor:pointer;">Place Order 🚀</button>
+  </div>
+</div>
+  <div class="menu-grid" id="menu-grid"></div>
+</div>
+
+<script>
+const API = 'http://localhost:8080';
+let token = '';
+let cart = [];
+let currentRestaurantId = null;
+
+window.onload = function() {
+    const savedToken = sessionStorage.getItem('token');
+    const savedName = sessionStorage.getItem('username');
+    if (savedToken && savedName) {
+        token = savedToken;
+        document.getElementById('wname').textContent = savedName;
+        document.getElementById('welcome-bar').style.display = 'flex';
+        document.getElementById('nav-links').style.display = 'none';
+        loadRestaurants();
+        showPage('app');
+    }
+};
+
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
+}
+
+function switchTab(btn, tab) {
+  document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(x => x.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'restaurants') loadRestaurants();
+  if (tab === 'orders') loadOrders();
+  if (tab === 'admin') loadRestaurantDropdown();
+}
+
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'msg ' + type;
+}
+
+// ─── CART ───────────────────────────────────────────
+function toggleCart() {
+  const sidebar = document.getElementById('cart-sidebar');
+  const overlay = document.getElementById('cart-overlay');
+  const isOpen = sidebar.style.display === 'flex';
+  sidebar.style.display = isOpen ? 'none' : 'flex';
+  overlay.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) renderCart();
+}
+
+function addToCart(restaurantId, itemId, itemName, itemPrice) {
+  if (currentRestaurantId && currentRestaurantId !== restaurantId) {
+    if (!confirm('Adding from a different restaurant will clear your current cart. Continue?')) return;
+    cart = [];
+  }
+  currentRestaurantId = restaurantId;
+  const existing = cart.find(c => c.itemId === itemId);
+  if (existing) {
+    existing.quantity += 1;
+  } else {
+    cart.push({ restaurantId, itemId, itemName, itemPrice, quantity: 1 });
+  }
+  updateCartCount();
+  showAddedFeedback(itemId);
+}
+
+function removeFromCart(itemId) {
+  const existing = cart.find(c => c.itemId === itemId);
+  if (existing) {
+    if (existing.quantity > 1) {
+      existing.quantity -= 1;
+    } else {
+      cart = cart.filter(c => c.itemId !== itemId);
+      if (cart.length === 0) currentRestaurantId = null;
+    }
+  }
+  updateCartCount();
+  renderCart();
+  updateMenuButtons();
+}
+
+function updateCartCount() {
+  const total = cart.reduce((sum, c) => sum + c.quantity, 0);
+  document.getElementById('cart-count').textContent = total;
+}
+
+function showAddedFeedback(itemId) {
+  const btn = document.getElementById('btn-' + itemId);
+  if (btn) {
+    btn.textContent = '✓ Added!';
+    btn.style.background = '#2e7d32';
+    setTimeout(() => {
+      updateMenuButtons();
+    }, 1000);
+  }
+}
+
+function updateMenuButtons() {
+  cart.forEach(c => {
+    const btn = document.getElementById('btn-' + c.itemId);
+    if (btn) {
+      btn.textContent = 'Added (' + c.quantity + ')';
+      btn.style.background = '#e65100';
+    }
+  });
+}
+
+function renderCart() {
+  const container = document.getElementById('cart-items');
+  const footer = document.getElementById('cart-footer');
+  if (cart.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:40px 0;color:#aaa;"><div style="font-size:48px;margin-bottom:12px;">🛒</div><p style="font-size:15px;">Your cart is empty!</p></div>';
+    footer.style.display = 'none';
+    return;
+  }
+  let total = 0;
+  container.innerHTML = cart.map(c => {
+    total += c.itemPrice * c.quantity;
+    return `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid #f0f0f0;">
+        <div>
+          <div style="font-size:15px;font-weight:700;color:#1a1a2e;">${c.itemName}</div>
+          <div style="font-size:13px;color:#ff3d00;font-weight:600;">₹${c.itemPrice} × ${c.quantity}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <button onclick="removeFromCart(${c.itemId})" style="width:30px;height:30px;border-radius:50%;border:2px solid #ff3d00;background:#fff;color:#ff3d00;font-size:18px;cursor:pointer;font-weight:800;display:flex;align-items:center;justify-content:center;">−</button>
+          <span style="font-size:16px;font-weight:700;min-width:20px;text-align:center;">${c.quantity}</span>
+          <button onclick="addToCart(${c.restaurantId}, ${c.itemId}, '${c.itemName}', ${c.itemPrice})" style="width:30px;height:30px;border-radius:50%;border:none;background:#ff3d00;color:#fff;font-size:18px;cursor:pointer;font-weight:800;display:flex;align-items:center;justify-content:center;">+</button>
+        </div>
+      </div>`;
+  }).join('');
+  document.getElementById('cart-total').textContent = '₹' + total.toFixed(2);
+  footer.style.display = 'block';
+}
+
+async function placeCartOrder() {
+  if (cart.length === 0) return;
+  try {
+    for (const item of cart) {
+      await fetch(API + '/api/orders', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token},
+        body: JSON.stringify({
+          "restaurantId": item.restaurantId,
+          "menuItemId": item.itemId,
+          "quantity": item.quantity
+        })
+      });
+    }
+    cart = [];
+    currentRestaurantId = null;
+    updateCartCount();
+    toggleCart();
+    const toast = document.getElementById('order-toast');
+    toast.style.display = 'block';
+    window.scrollTo(0, 0);
+    setTimeout(() => toast.style.display = 'none', 4000);
+  } catch(e) { alert('Failed to place order!'); }
+}
+// ────────────────────────────────────────────────────
+
+async function register() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-pass').value.trim();
+  if (!name || !email || !password) { showMsg('reg-msg','Fill all fields!','error'); return; }
+  try {
+    const res = await fetch(API + '/api/auth/register', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({"name": name, "email": email, "password": password})
+    });
+    const txt = await res.text();
+    if (res.ok) {
+      showMsg('reg-msg', '✅ Registered! Redirecting to login...', 'success');
+      setTimeout(() => showPage('login'), 1500);
+    } else {
+      showMsg('reg-msg', '❌ ' + txt, 'error');
+    }
+  } catch(e) { showMsg('reg-msg', '❌ Server not reachable!', 'error'); }
+}
+
+async function login() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-pass').value.trim();
+  if (!email || !password) { showMsg('login-msg','Fill all fields!','error'); return; }
+  try {
+    const res = await fetch(API + '/api/auth/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({"email": email, "password": password})
+    });
+    const txt = await res.text();
+    if (res.ok) {
+      token = txt.trim();
+      const username = email.split('@')[0];
+      sessionStorage.setItem('token', token);
+      sessionStorage.setItem('username', username);
+      document.getElementById('wname').textContent = username;
+      document.getElementById('welcome-bar').style.display = 'flex';
+      document.getElementById('nav-links').style.display = 'none';
+      loadRestaurants();
+      showPage('app');
+    } else {
+      showMsg('login-msg', '❌ Wrong email or password!', 'error');
+    }
+  } catch(e) { showMsg('login-msg', '❌ Server not reachable!', 'error'); }
+}
+
+async function loadRestaurants() {
+  const grid = document.getElementById('r-grid');
+  grid.innerHTML = '<div class="empty-msg">Loading...</div>';
+  try {
+    const res = await fetch(API + '/api/restaurants', {
+      headers: {'Authorization': 'Bearer ' + token}
+    });
+    const data = await res.json();
+    if (!data.length) { grid.innerHTML = '<div class="empty-msg">No restaurants yet. Add from Admin tab!</div>'; return; }
+    grid.innerHTML = data.map(r => `
+      <div class="r-card" onclick="openMenu(${r.id}, '${r.name}')">
+        <h3>${r.name}</h3>
+        <p>📍 ${r.address}</p>
+        <p>📞 ${r.phone}</p>
+        <span class="badge">${r.cuisine}</span>
+      </div>`).join('');
+  } catch(e) { grid.innerHTML = '<div class="empty-msg">Failed to load restaurants.</div>'; }
+}
+
+async function openMenu(id, name) {
+  document.getElementById('menu-title').textContent = '🍴 ' + name;
+  document.getElementById('order-toast').style.display = 'none';
+  document.getElementById('menu-grid').innerHTML = '<div class="empty-msg">Loading menu...</div>';
+  showPage('menu');
+  cart = [];
+  currentRestaurantId = id;
+  updateCartCount();
+  try {
+    const res = await fetch(API + '/api/restaurants/' + id + '/menu', {
+      headers: {'Authorization': 'Bearer ' + token}
+    });
+    const items = await res.json();
+    if (!items.length) { document.getElementById('menu-grid').innerHTML = '<div class="empty-msg">No items yet. Add from Admin!</div>'; return; }
+    document.getElementById('menu-grid').innerHTML = items.map(item => `
+      <div class="m-card">
+        <div class="m-card-info">
+          <h4>${item.name}</h4>
+          <p>${item.description}</p>
+          <span class="cat">${item.category}</span>
+        </div>
+        <div class="m-card-right">
+          <div class="m-price">₹${item.price}</div>
+          <button class="btn-order" id="btn-${item.id}"
+            onclick="addToCart(${id}, ${item.id}, '${item.name}', ${item.price})">
+            Add to Cart
+          </button>
+        </div>
+      </div>`).join('');
+  } catch(e) { document.getElementById('menu-grid').innerHTML = '<div class="empty-msg">Failed to load menu.</div>'; }
+}
+
+async function loadOrders() {
+  const list = document.getElementById('orders-list');
+  list.innerHTML = '<div class="empty-msg">Loading...</div>';
+  try {
+    const res = await fetch(API + '/api/orders/my', {
+      headers: {'Authorization': 'Bearer ' + token}
+    });
+    const data = await res.json();
+    if (!data.length) { list.innerHTML = '<div class="empty-msg">No orders yet! Go order something 😊</div>'; return; }
+    list.innerHTML = data.map(o => `
+      <div class="o-card">
+        <h4>Order #${o.id}</h4>
+        <p>🍔 <strong>${o.menuItem.name}</strong></p>
+        <p>🏪 ${o.restaurant.name}</p>
+        <p>💰 Total: <strong>₹${o.totalPrice}</strong></p>
+        <p>🕐 ${new Date(o.orderTime).toLocaleString()}</p>
+        <span class="o-status s-${o.status}">${o.status}</span>
+      </div>`).join('');
+  } catch(e) { list.innerHTML = '<div class="empty-msg">Failed to load orders.</div>'; }
+}
+
+async function loadRestaurantDropdown() {
+  try {
+    const res = await fetch(API + '/api/restaurants', {
+      headers: {'Authorization': 'Bearer ' + token}
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const sel = document.getElementById('am-rest');
+    sel.innerHTML = '<option value="">Select Restaurant</option>' +
+      data.map(r => `<option value="${r.id}">${r.name}</option>`).join('');
+  } catch(e) {}
+}
+
+async function addRestaurant() {
+  const name = document.getElementById('ar-name').value.trim();
+  const address = document.getElementById('ar-address').value.trim();
+  const cuisine = document.getElementById('ar-cuisine').value.trim();
+  const phone = document.getElementById('ar-phone').value.trim();
+  if (!name || !address || !cuisine || !phone) { showMsg('ar-msg','Fill all fields!','error'); return; }
+  try {
+    const res = await fetch(API + '/api/restaurants', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token},
+      body: JSON.stringify({"name": name, "address": address, "cuisine": cuisine, "phone": phone})
+    });
+    if (res.ok) {
+      showMsg('ar-msg', '✅ Restaurant added!', 'success');
+      document.getElementById('ar-name').value = '';
+      document.getElementById('ar-address').value = '';
+      document.getElementById('ar-cuisine').value = '';
+      document.getElementById('ar-phone').value = '';
+      await loadRestaurantDropdown();
+    } else {
+      showMsg('ar-msg', '❌ Failed!', 'error');
+    }
+  } catch(e) { showMsg('ar-msg', '❌ Server error!', 'error'); }
+}
+
+async function addMenuItem() {
+  const restaurantId = document.getElementById('am-rest').value;
+  const name = document.getElementById('am-name').value.trim();
+  const description = document.getElementById('am-desc').value.trim();
+  const price = document.getElementById('am-price').value;
+  const category = document.getElementById('am-cat').value.trim();
+  if (!restaurantId || !name || !description || !price || !category) { showMsg('am-msg','Fill all fields!','error'); return; }
+  try {
+    const res = await fetch(API + '/api/restaurants/menu', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token},
+      body: JSON.stringify({
+        "name": name,
+        "description": description,
+        "price": parseFloat(price),
+        "category": category,
+        "restaurant": {"id": parseInt(restaurantId)}
+      })
+    });
+    if (res.ok) {
+      showMsg('am-msg', '✅ Menu item added!', 'success');
+      document.getElementById('am-name').value = '';
+      document.getElementById('am-desc').value = '';
+      document.getElementById('am-price').value = '';
+      document.getElementById('am-cat').value = '';
+    } else {
+      showMsg('am-msg', '❌ Failed!', 'error');
+    }
+  } catch(e) { showMsg('am-msg', '❌ Server error!', 'error'); }
+}
+
+function goBack() {
+  cart = [];
+  currentRestaurantId = null;
+  updateCartCount();
+  showPage('app');
+  loadRestaurants();
+}
+
+function logout() {
+  sessionStorage.removeItem('token');
+  sessionStorage.removeItem('username');
+  token = '';
+  cart = [];
+  document.getElementById('welcome-bar').style.display = 'none';
+  document.getElementById('nav-links').style.display = 'flex';
+  showPage('login');
+}
+</script>
+</body>
+</html>
